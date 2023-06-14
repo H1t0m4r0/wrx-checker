@@ -57,7 +57,7 @@ fn main() {
     // コマンドライン引数の受付
     let args: Vec<String> = env::args().collect();
     // ファイル名を取得
-    if args.len() <= 2 || args.len() >= 3 {
+    if args.len() < 2 || args.len() >= 3 {
         println!("Usage: {} file_name", args[0]);
         return;
     }
