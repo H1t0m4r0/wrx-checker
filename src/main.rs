@@ -1,6 +1,7 @@
 use std::env;
 use std::fs;
 use std::os::unix::prelude::PermissionsExt;
+use colored::*;
 
 // ユーザーの権限を確認して表示
 fn user_permission(mode: &u32) {
@@ -8,7 +9,11 @@ fn user_permission(mode: &u32) {
     let user_write = mode & 0o200 != 0;         // ユーザーの書き込み権限を確認
     let user_executable = mode & 0o100 != 0;    // ユーザーの実行権限を確認
 
-    println!("User: {}{}{}", read_permission(user_read), write_permission(user_write), execute_permission(user_executable));
+    println!("User: {}{}{}", 
+        read_permission(user_read).green(),
+        write_permission(user_write).green(),
+        execute_permission(user_executable).green()
+    );
 }
 
 // グループの権限を確認して表示
