@@ -10,9 +10,9 @@ fn user_permission(mode: &u32) {
     let user_executable = mode & 0o100 != 0;    // ユーザーの実行権限を確認
 
     println!("User: {}{}{}", 
-        read_permission(user_read).green(),
-        write_permission(user_write).green(),
-        execute_permission(user_executable).green()
+        read_permission(user_read),
+        write_permission(user_write),
+        execute_permission(user_executable)
     );
 }
 
@@ -23,9 +23,9 @@ fn group_permission(mode: &u32) {
     let group_executable = mode & 0o10 != 0;
 
     println!("Group: {}{}{}", 
-        read_permission(group_read).green(), 
-        write_permission(group_write).green(),
-        execute_permission(group_executable).green()
+        read_permission(group_read), 
+        write_permission(group_write),
+        execute_permission(group_executable)
     );
 }
 
@@ -36,33 +36,33 @@ fn other_permission(mode: &u32) {
     let other_executable = mode & 0o1 != 0;
 
     println!("Other: {}{}{}", 
-        read_permission(other_read).green(), 
-        write_permission(other_write).green(), 
-        execute_permission(other_executable).green()
+        read_permission(other_read), 
+        write_permission(other_write), 
+        execute_permission(other_executable)
     );
 }
 
 fn read_permission(can_i_read: bool) -> String { 
     if can_i_read {
-        return "Read ".to_string();
+        return "Read ".to_string().green().to_string();
     } else {
-        return "".to_string();
+        return "Read ".to_string().red().to_string();
     }
 }
 
 fn write_permission(can_i_write: bool) -> String {
     if can_i_write {
-        return "Write ".to_string();
+        return "Write ".to_string().green().to_string();
     } else {
-        return "".to_string();
+        return "Write ".to_string().red().to_string();
     }
 }
 
 fn execute_permission(can_i_execute: bool) -> String {
     if can_i_execute {
-        return "Execute".to_string();
+        return "Execute".to_string().green().to_string();
     } else {
-        return "".to_string();
+        return "Execute".to_string().red().to_string();
     }
 }
 
