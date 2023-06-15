@@ -9,7 +9,7 @@ fn user_permission(mode: &u32) {
     let user_write = mode & 0o200 != 0;         // ユーザーの書き込み権限を確認
     let user_executable = mode & 0o100 != 0;    // ユーザーの実行権限を確認
 
-    println!("User: {}{}{}", 
+    println!("User:\t{}  {}  {}", 
         read_permission(user_read),
         write_permission(user_write),
         execute_permission(user_executable)
@@ -22,7 +22,7 @@ fn group_permission(mode: &u32) {
     let group_write = mode & 0o20 != 0;
     let group_executable = mode & 0o10 != 0;
 
-    println!("Group: {}{}{}", 
+    println!("Group:\t{}  {}  {}", 
         read_permission(group_read), 
         write_permission(group_write),
         execute_permission(group_executable)
@@ -35,7 +35,7 @@ fn other_permission(mode: &u32) {
     let other_write = mode & 0o2 != 0;
     let other_executable = mode & 0o1 != 0;
 
-    println!("Other: {}{}{}", 
+    println!("Other:\t{}  {}  {}", 
         read_permission(other_read), 
         write_permission(other_write), 
         execute_permission(other_executable)
@@ -44,17 +44,17 @@ fn other_permission(mode: &u32) {
 
 fn read_permission(can_i_read: bool) -> ColoredString { 
     if can_i_read {
-        return "Read ".green();
+        return "Read".green();
     } else {
-        return "Read ".red();
+        return "Read".red();
     }
 }
 
 fn write_permission(can_i_write: bool) -> ColoredString {
     if can_i_write {
-        return "Write ".green();
+        return "Write".green();
     } else {
-        return "Write ".red();
+        return "Write".red();
     }
 }
 
