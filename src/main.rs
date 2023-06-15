@@ -42,27 +42,27 @@ fn other_permission(mode: &u32) {
     );
 }
 
-fn read_permission(can_i_read: bool) -> String { 
+fn read_permission(can_i_read: bool) -> ColoredString { 
     if can_i_read {
-        return "Read ".to_string().green().to_string();
+        return "Read ".green();
     } else {
-        return "Read ".to_string().red().to_string();
+        return "Read ".red();
     }
 }
 
-fn write_permission(can_i_write: bool) -> String {
+fn write_permission(can_i_write: bool) -> ColoredString {
     if can_i_write {
-        return "Write ".to_string().green().to_string();
+        return "Write ".green();
     } else {
-        return "Write ".to_string().red().to_string();
+        return "Write ".red();
     }
 }
 
-fn execute_permission(can_i_execute: bool) -> String {
+fn execute_permission(can_i_execute: bool) -> ColoredString {
     if can_i_execute {
-        return "Execute".to_string().green().to_string();
+        return "Execute".green();
     } else {
-        return "Execute".to_string().red().to_string();
+        return "Execute".red();
     }
 }
 
