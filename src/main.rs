@@ -22,7 +22,11 @@ fn group_permission(mode: &u32) {
     let group_write = mode & 0o20 != 0;
     let group_executable = mode & 0o10 != 0;
 
-    println!("Group: {}{}{}", read_permission(group_read), write_permission(group_write), execute_permission(group_executable));
+    println!("Group: {}{}{}", 
+        read_permission(group_read).green(), 
+        write_permission(group_write).green(),
+        execute_permission(group_executable).green()
+    );
 }
 
 // その他の権限を確認して表示
@@ -31,7 +35,11 @@ fn other_permission(mode: &u32) {
     let other_write = mode & 0o2 != 0;
     let other_executable = mode & 0o1 != 0;
 
-    println!("Other: {}{}{}", read_permission(other_read), write_permission(other_write), execute_permission(other_executable));
+    println!("Other: {}{}{}", 
+        read_permission(other_read).green(), 
+        write_permission(other_write).green(), 
+        execute_permission(other_executable).green()
+    );
 }
 
 fn read_permission(can_i_read: bool) -> String { 
