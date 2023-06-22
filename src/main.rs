@@ -3,6 +3,7 @@ use std::env;
 use std::fs;
 use std::os::unix::prelude::PermissionsExt;
 
+// check_permissionマクロを定義
 macro_rules! check_permission {
     ($type: ident, $mode: expr, $read_bit: expr, $write_bit: expr, $execute_bit: expr) => {
         fn $type(mode: &u32) {
@@ -11,7 +12,7 @@ macro_rules! check_permission {
             let can_execute = mode & $execute_bit != 0;
 
             println!(
-                "{}:        {} {} {}",
+                "{}:\t{} {} {}",
                 stringify!($type),
                 permission_color(&can_read, "Read"),
                 permission_color(&can_write, "Write"),
@@ -21,9 +22,9 @@ macro_rules! check_permission {
     };
 }
 
-check_permission!(user_permission, mode, 0o400, 0o200, 0o100);
-check_permission!(group_permission, mode, 0o40, 0o20, 0o10);
-check_permission!(other_permission, mode, 0o4, 0o2, 0o1);
+check_permission!(user, mode, 0o400, 0o200, 0o100);
+check_permission!(group, mode, 0o40, 0o20, 0o10);
+check_permission!(other, mode, 0o4, 0o2, 0o1);
 
 fn permission_color(has_permission: &bool, permission_name: &str) -> ColoredString {
     if *has_permission {
@@ -51,9 +52,9 @@ fn main() {
             let permission = metadata.permissions();
             let mode = permission.mode();
 
-            user_permission(&mode);
-            group_permission(&mode);
-            other_permission(&mode);
+            user(&mode);
+            group(&mode);
+            other(&mode);
         }
         Err(e) => {
             eprintln!("Error: {}", e);
