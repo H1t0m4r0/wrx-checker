@@ -2,6 +2,28 @@ use colored::*;
 use std::env;
 use std::fs;
 use std::os::unix::prelude::PermissionsExt;
+use std::path::PathBuf;
+use structopt::StructOpt;
+
+#[derive(Debug, StructOpt)]
+#[structopt(name = "file_permissions")]
+struct Opt {
+    // ファイル名
+    #[structopt(parse(from_os_str))]
+    file_path: PathBuf,
+
+    // ユーザー権限
+    #[structopt(short = "u", long)]
+    user: bool,
+
+    // グループ権限
+    #[structopt(short = "g", long)]
+    group: bool,
+
+    // その他の権限
+    #[structopt(short = "o", long)]
+    other: bool,
+}
 
 // check_permissionマクロを定義
 macro_rules! check_permission {
@@ -34,27 +56,56 @@ fn permission_color(has_permission: &bool, permission_name: &str) -> ColoredStri
     }
 }
 
+fn print_file_type(metadata: &fs::Metadata) {
+    let file_type = metadata.file_type();
+
+    if file_type.is_dir() {
+        println!("File type:\tDirectory");
+    } else if file_type.is_file() {
+        println!("File type:\tFile");
+    } else if file_type.is_symlink() {
+        println!("File type:\tSymbolic Link");
+    } else {
+        println!("File type:\tUnknown");
+    }
+}
+
 fn main() {
     // コマンドライン引数の受付
     let args: Vec<String> = env::args().collect();
     // ファイル名を取得
-    if args.len() < 2 || args.len() >= 3 {
-        println!("Usage:\t{} \"file_name\"", args[0]);
+    if args.len() < 2 || args.len() >= 6 {
+        println!("Usage:\t{} [FILE NAME] [OPTION]", args[0]);
         return;
     }
 
+    let opt = Opt::from_args();
     // ファイル名(第2引数)の値を変数に格納
-    let file_path = &args[1];
-
+    // let file_path = &args[1];
     // ファイル名の存在確認
-    match fs::metadata(file_path) {
+    match fs::metadata(opt.file_path) {
         Ok(metadata) => {
+            print_file_type(&metadata);
             let permission = metadata.permissions();
             let mode = permission.mode();
 
-            user(&mode);
-            group(&mode);
-            other(&mode);
+            // オプション指定時は指定された権限のみを表示
+            if opt.user {
+                user(&mode);
+            }
+            if opt.group {
+                group(&mode);
+            }
+            if opt.other {
+                other(&mode);
+            }
+
+            // オプション無指定時は全ての権限を表示
+            if !opt.user && !opt.group && !opt.other {
+                user(&mode);
+                group(&mode);
+                other(&mode);
+            }
         }
         Err(e) => {
             eprintln!("Error: {}", e);
