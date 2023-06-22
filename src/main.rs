@@ -1,68 +1,35 @@
+use colored::*;
 use std::env;
 use std::fs;
 use std::os::unix::prelude::PermissionsExt;
-use colored::*;
 
-// ユーザーの権限を確認して表示
-fn user_permission(mode: &u32) {
-    let user_read = mode & 0o400 != 0;          // ユーザーの読み取り権限を確認
-    let user_write = mode & 0o200 != 0;         // ユーザーの書き込み権限を確認
-    let user_executable = mode & 0o100 != 0;    // ユーザーの実行権限を確認
+macro_rules! check_permission {
+    ($type: ident, $mode: expr, $read_bit: expr, $write_bit: expr, $execute_bit: expr) => {
+        fn $type(mode: &u32) {
+            let can_read = mode & $read_bit != 0;
+            let can_write = mode & $write_bit != 0;
+            let can_execute = mode & $execute_bit != 0;
 
-    println!("User: {}{}{}", 
-        read_permission(user_read),
-        write_permission(user_write),
-        execute_permission(user_executable)
-    );
+            println!(
+                "{}:        {} {} {}",
+                stringify!($type),
+                permission_color(&can_read, "Read"),
+                permission_color(&can_write, "Write"),
+                permission_color(&can_execute, "Execute")
+            );
+        }
+    };
 }
 
-// グループの権限を確認して表示
-fn group_permission(mode: &u32) {
-    let group_read = mode & 0o40 != 0;
-    let group_write = mode & 0o20 != 0;
-    let group_executable = mode & 0o10 != 0;
+check_permission!(user_permission, mode, 0o400, 0o200, 0o100);
+check_permission!(group_permission, mode, 0o40, 0o20, 0o10);
+check_permission!(other_permission, mode, 0o4, 0o2, 0o1);
 
-    println!("Group: {}{}{}", 
-        read_permission(group_read), 
-        write_permission(group_write),
-        execute_permission(group_executable)
-    );
-}
-
-// その他の権限を確認して表示
-fn other_permission(mode: &u32) {
-    let other_read = mode & 0o4 != 0;
-    let other_write = mode & 0o2 != 0;
-    let other_executable = mode & 0o1 != 0;
-
-    println!("Other: {}{}{}", 
-        read_permission(other_read), 
-        write_permission(other_write), 
-        execute_permission(other_executable)
-    );
-}
-
-fn read_permission(can_i_read: bool) -> ColoredString { 
-    if can_i_read {
-        return "Read ".green();
+fn permission_color(has_permission: &bool, permission_name: &str) -> ColoredString {
+    if *has_permission {
+        return permission_name.green();
     } else {
-        return "Read ".red();
-    }
-}
-
-fn write_permission(can_i_write: bool) -> ColoredString {
-    if can_i_write {
-        return "Write ".green();
-    } else {
-        return "Write ".red();
-    }
-}
-
-fn execute_permission(can_i_execute: bool) -> ColoredString {
-    if can_i_execute {
-        return "Execute".green();
-    } else {
-        return "Execute".red();
+        return permission_name.red();
     }
 }
 
@@ -74,15 +41,15 @@ fn main() {
         println!("Usage: {} file_name", args[0]);
         return;
     }
-    
+
     // ファイル名(第2引数)の値を変数に格納
     let file_path = &args[1];
-    
+
     // ファイル名の存在確認
     match fs::metadata(file_path) {
         Ok(metadata) => {
-            let permissions = metadata.permissions();
-            let mode = permissions.mode();
+            let permission = metadata.permissions();
+            let mode = permission.mode();
 
             user_permission(&mode);
             group_permission(&mode);
