@@ -1,4 +1,5 @@
 use colored::*;
+use filemagic::magic;
 use std::env;
 use std::fs;
 use std::os::unix::prelude::PermissionsExt;
@@ -34,7 +35,7 @@ macro_rules! check_permission {
             let can_execute = mode & $execute_bit != 0;
 
             println!(
-                "{}:\t{} {} {}",
+                "{}:\t\t{} {} {}",
                 stringify!($type),
                 permission_color(&can_read, "Read"),
                 permission_color(&can_write, "Write"),
@@ -56,18 +57,11 @@ fn permission_color(has_permission: &bool, permission_name: &str) -> ColoredStri
     }
 }
 
-fn print_file_type(metadata: &fs::Metadata) {
-    let file_type = metadata.file_type();
+fn print_file_type(opt: &Opt) {
+    let file_path = &opt.file_path;
+    let magic = magic!().expect("error");
 
-    if file_type.is_dir() {
-        println!("File type:\tDirectory");
-    } else if file_type.is_file() {
-        println!("File type:\tFile");
-    } else if file_type.is_symlink() {
-        println!("File type:\tSymbolic Link");
-    } else {
-        println!("File type:\tUnknown");
-    }
+    println!("File type:\t{}", magic.file(&file_path).expect("error"));
 }
 
 fn main() {
@@ -83,9 +77,9 @@ fn main() {
     // ファイル名(第2引数)の値を変数に格納
     // let file_path = &args[1];
     // ファイル名の存在確認
-    match fs::metadata(opt.file_path) {
+    match fs::metadata(&opt.file_path) {
         Ok(metadata) => {
-            print_file_type(&metadata);
+            print_file_type(&opt);
             let permission = metadata.permissions();
             let mode = permission.mode();
 
